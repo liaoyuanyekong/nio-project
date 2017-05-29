@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -110,6 +111,7 @@ public class MultiplexerTimeServer  implements  Runnable{
                 ByteBuffer byteBuffer=ByteBuffer.allocate(1024);
                 //Reads a sequence of bytes from this channel into the given buffer.
                 int readBytes= socketChannel.read(byteBuffer);
+                //大于0 读到了字节;等于0 没读取到字节，不做处理正常情况;返回-1 链路已经关闭释放资源
                 if(readBytes>0){
                     /*Flips this buffer.  The limit is set to the current position and then
                     * the position is set to zero.  If the mark is defined then it is discarded
@@ -121,13 +123,34 @@ public class MultiplexerTimeServer  implements  Runnable{
                     byteBuffer.get(bytes);
                     String body =new String(bytes,"UTF-8");
                     System.out.println("this time server receive order is "+body);
-                    
-
-                }
-
+                    String currentTime="QUERY TIME ORDER".equalsIgnoreCase(body)?
+                            new Date(System.currentTimeMillis()).toString():"BAD ORDER";
+                    //消息写回客户端
+                    doWrite(socketChannel,body);
+                }else if(readBytes<0){
+                    key.channel();
+                    socketChannel.close();
+                }else ;
             }
         }
+    }
 
+    /**
+     * 反馈消息到客户端的方法
+     * @param channel
+     * @param response
+     */
+    private void doWrite(SocketChannel channel,String response) throws IOException {
+        if(response!=null && response.trim().length()>0){
+            //创建缓冲区
+            byte[] bytes=response.getBytes();
+            ByteBuffer byteBuffer=ByteBuffer.allocate(bytes.length);
+            //数据放入缓冲区
+            byteBuffer.put(bytes);
+            //添加缓冲区数据到管道
+            byteBuffer.flip();
+            channel.write(byteBuffer);
+        }
     }
 
 
