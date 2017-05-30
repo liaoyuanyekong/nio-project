@@ -80,6 +80,7 @@ public class MultiplexerTimeServer  implements  Runnable{
 
             } catch (IOException e) {
                 e.printStackTrace();
+                System.exit(1);
             }
         }
         //关闭多路复用器，释放资源
@@ -126,7 +127,7 @@ public class MultiplexerTimeServer  implements  Runnable{
                     String currentTime="QUERY TIME ORDER".equalsIgnoreCase(body)?
                             new Date(System.currentTimeMillis()).toString():"BAD ORDER";
                     //消息写回客户端
-                    doWrite(socketChannel,body);
+                    doWrite(socketChannel,currentTime);
                 }else if(readBytes<0){
                     key.channel();
                     socketChannel.close();

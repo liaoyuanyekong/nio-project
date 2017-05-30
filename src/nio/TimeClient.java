@@ -1,9 +1,10 @@
 package nio;
 
 /**
- * Created by WangZhihao on 2017/5/28.
+ * Created by WangZhihao on 2017/5/30.
  */
-public class TImeServer {
+public class TimeClient {
+
     public static void main(String[] args) {
         int port=8080;
         if(args!=null && args.length>0){
@@ -13,6 +14,6 @@ public class TImeServer {
 
             }
         }
-        new Thread(new MultiplexerTimeServer(port),"MultiplexerTimeServer-001").start();
+        new Thread(new TimeClientHandle(null,port),"TimeClient-001").start();
     }
 }
