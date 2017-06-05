@@ -1,12 +1,14 @@
 package com.wang.netty.nio;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.Future;
 
 /**
  * 客户端代码
@@ -26,6 +28,8 @@ public class TimeClient {
                             socketChannel.pipeline().addLast(new TimeClientHandler());
                         }
                     });
+            ChannelFuture channelFuture= bootstrap.connect(host,port).sync();
+            channelFuture.channel().closeFuture().sync();
 
         }finally {
             group.shutdownGracefully();

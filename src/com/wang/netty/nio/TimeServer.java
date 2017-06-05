@@ -31,7 +31,7 @@ public class TimeServer {
             //绑定接口，同步等待成功
             ChannelFuture channelFuture= bootstrap.bind(port).sync();
             //阻塞作用，等待服务端监听接口关闭后main方法才能退出，和NIO的while作用类似
-            channelFuture.channel().close().sync();
+            channelFuture.channel().closeFuture().sync();
         }finally {
             //优雅的退出，释放资源
             bossGroup.shutdownGracefully();
